@@ -1,0 +1,25 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "whopper:whopper_side",
+    "textures": {
+      "bottom": "whopper:blocks/whopper_bottom",
+      "inside": "whopper:blocks/whopper_inside",
+      "side": "whopper:blocks/whopper_side",
+      "top": "whopper:blocks/whopper_top"
+    },
+    "transform": "forge:default-block"
+  },
+  "variants": {
+    "inventory": [{ "model": "whopper:whopper_down" }],
+    "facing": {
+      "down": {
+        "model": "whopper:whopper_down"
+      },
+      "north": {},
+      "south": { "y": 180 },
+      "east": { "y": 90 },
+      "west": { "y": 270 }
+    }
+  }
+}
