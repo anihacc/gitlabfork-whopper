@@ -18,3 +18,6 @@ A wooden hopper inspired by [Wopper](https://github.com/Ellpeck/Wopper) For Mine
 
 #### [ShadowFacts](https://shadowfacts.net/tutorials/forge-modding-112/) 
 * for more great tutorials
+
+#### [RWTema](https://www.patreon.com/rwtema)
+* for his diet hopper
