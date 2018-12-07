@@ -1,6 +1,5 @@
 package nonet.vibes81.whopper.blocks;
 
-import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
@@ -44,15 +43,11 @@ import java.util.stream.Stream;
 import static net.minecraft.inventory.InventoryHelper.spawnItemStack;
 
 public class BlockWhopper extends Block implements ITileEntityProvider, IGuiTile {
-    public static final PropertyDirection FACING = PropertyDirection.create("facing", new Predicate<EnumFacing>(){
-        @Override
-        public boolean apply(EnumFacing facing){
-            return facing != EnumFacing.UP;
-        }
-    });
 
-
+    public static final PropertyDirection FACING = PropertyDirection.create("facing", facing -> facing != EnumFacing.UP);
     public static final ResourceLocation BLOCK_WHOPPER = new ResourceLocation(Ref.MOD_ID, "whopper");
+
+    //Diet hopper code by RWTema
     private static final EnumMap<EnumFacing, List<AxisAlignedBB>> bounds;
     protected static final AxisAlignedBB BASE_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.625D, 1.0D);
     protected static final AxisAlignedBB SOUTH_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 1.0D, 0.125D);
@@ -82,8 +77,6 @@ public class BlockWhopper extends Block implements ITileEntityProvider, IGuiTile
     private static AxisAlignedBB makeAABB(int fromX, int fromY, int fromZ, int toX, int toY, int toZ) {
         return new AxisAlignedBB(fromX / 16F, fromY / 16F, fromZ / 16F, toX / 16F, toY / 16F, toZ / 16F);
     }
-
-
 
     public BlockWhopper(){
         super(Material.WOOD);
