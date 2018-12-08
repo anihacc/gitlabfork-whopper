@@ -190,7 +190,7 @@ public class TileWhopper extends TileEntity implements IRestorableTileEntity, IT
     @SuppressWarnings("NullableProblems")
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
-        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY && facing != EnumFacing.DOWN) {
             return true;
         }
         return super.hasCapability(capability, facing);
