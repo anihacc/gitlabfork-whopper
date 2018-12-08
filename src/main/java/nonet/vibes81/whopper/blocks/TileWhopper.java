@@ -47,10 +47,11 @@ public class TileWhopper extends TileEntity implements IRestorableTileEntity, IT
                         if(!ItemStack.areItemStacksEqual(stack, left)){
                             int toExtract = stack.getCount() - left.getCount();
                             this.handlerPull.extractItem(i, toExtract, false);
+                            markDirty();
                             break;
                         }
                     }
-                } else if (WhooperConfig.WHOPPER_VACUUM){
+                } else if (!this.isRedstonePowered && WhooperConfig.WHOPPER_VACUUM){
                     List<EntityItem> items = this.world.getEntitiesWithinAABB(EntityItem.class, new AxisAlignedBB(this.pos.getX(), this.pos.getY()+0.5, this.pos.getZ(), this.pos.getX()+1, this.pos.getY()+2, this.pos.getZ()+1));
                     if(!items.isEmpty()){
                         for(EntityItem item : items)
@@ -58,10 +59,11 @@ public class TileWhopper extends TileEntity implements IRestorableTileEntity, IT
                                 ItemStack left = this.inventory.insertItem(0, item.getItem(), false);
                                 item.setItem(left);
                             }
+                        markDirty();
                     }
                 }
                 //push
-                if(this.handlerPush != null && this.inventory != null) {
+                if(!this.isRedstonePowered && this.handlerPush != null && this.inventory != null) {
                     for(int i = 0; i < this.handlerPush.getSlots(); i++){
 
                         ItemStack stack1 = this.inventory.extractItem(0, 1, true);
@@ -70,11 +72,11 @@ public class TileWhopper extends TileEntity implements IRestorableTileEntity, IT
                         if(!ItemStack.areItemStacksEqual(stack1, left1)){
                             int toExtract = stack1.getCount() - left1.getCount();
                             this.inventory.extractItem(0, toExtract, false);
+                            markDirty();
                             break;
                         }
                     }
                 }
-                markDirty();
             }
         }
 
@@ -126,8 +128,7 @@ public class TileWhopper extends TileEntity implements IRestorableTileEntity, IT
         inventory.deserializeNBT(compound.getCompoundTag("inventory"));
     }
 
-    int getComparatorLevel()
-    {
+    int getComparatorLevel() {
         if(!WhooperConfig.WHOPPER_COMPARATOR)
             return 0;
         int i = 0;
