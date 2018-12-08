@@ -33,6 +33,21 @@ minecraft {
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 }
 
+repositories {
+    //JEI
+    maven { url "http://dvs1.progwml6.com/files/maven" }
+    //Top
+    maven { url "http://maven.tterrag.com" }
+}
+
+dependencies {
+    deobfProvided "mezz.jei:jei_1.12.2:4.14.0.231:api"
+    runtime "mezz.jei:jei_1.12.2:4.14.0.231"
+
+    deobfProvided "mcjty.theoneprobe:TheOneProbe-1.12:1.12-1.4.23-16:api"
+    runtime "mcjty.theoneprobe:TheOneProbe-1.12:1.12-1.4.23-16"
+}
+
 processResources {
     // this will ensure that this task is redone when the versions change.
     inputs.property "version", project.version
