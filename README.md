@@ -7,6 +7,10 @@ A wooden hopper inspired by [Wopper](https://github.com/Ellpeck/Wopper) For Mine
 * Enable/Disable if the whopper should output to comparators
 * Enable/Disable whopper collecting items above it
 * Ticks the whopper runs at
+* A GUI to manage its 1 internal slot
+* Can be chained together with other whoppers/hoppers
+
+[Download on Curse](https://minecraft.curseforge.com/projects/whopper)
 
 ### Credits
 
