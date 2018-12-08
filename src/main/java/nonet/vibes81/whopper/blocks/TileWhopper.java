@@ -51,26 +51,29 @@ public class TileWhopper extends TileEntity implements IRestorableTileEntity, IT
                             break;
                         }
                     }
-                } else if (!this.isRedstonePowered && WhooperConfig.WHOPPER_VACUUM){
+                 //Collect items above whopper
+                } else if (WhooperConfig.WHOPPER_VACUUM){
                     List<EntityItem> items = this.world.getEntitiesWithinAABB(EntityItem.class, new AxisAlignedBB(this.pos.getX(), this.pos.getY()+0.5, this.pos.getZ(), this.pos.getX()+1, this.pos.getY()+2, this.pos.getZ()+1));
-                    if(!items.isEmpty()){
-                        for(EntityItem item : items)
+                    if(!items.isEmpty()) {
+                        for (EntityItem item : items) {
                             if (item != null && !item.isDead) {
                                 ItemStack left = this.inventory.insertItem(0, item.getItem(), false);
                                 item.setItem(left);
+                                markDirty();
+                                break;
                             }
-                        markDirty();
+                        }
                     }
                 }
                 //push
-                if(!this.isRedstonePowered && this.handlerPush != null && this.inventory != null) {
+                if(this.handlerPush != null && this.inventory != null) {
                     for(int i = 0; i < this.handlerPush.getSlots(); i++){
 
-                        ItemStack stack1 = this.inventory.extractItem(0, 1, true);
-                        ItemStack left1 = this.handlerPush.insertItem(i, stack1, false);
+                        ItemStack stack = this.inventory.extractItem(0, 1, true);
+                        ItemStack left = this.handlerPush.insertItem(i, stack, false);
 
-                        if(!ItemStack.areItemStacksEqual(stack1, left1)){
-                            int toExtract = stack1.getCount() - left1.getCount();
+                        if(!ItemStack.areItemStacksEqual(stack, left)){
+                            int toExtract = stack.getCount() - left.getCount();
                             this.inventory.extractItem(0, toExtract, false);
                             markDirty();
                             break;
@@ -78,11 +81,10 @@ public class TileWhopper extends TileEntity implements IRestorableTileEntity, IT
                     }
                 }
             }
-        }
-
-        if(!this.didFirstTick){
-            this.onChange();
-            this.didFirstTick = true;
+            if(!this.didFirstTick){
+                this.onChange();
+                this.didFirstTick = true;
+            }
         }
     }
 
