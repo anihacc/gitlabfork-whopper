@@ -13,11 +13,16 @@ import net.minecraft.util.ITickable;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.world.IWorldNameable;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
+import nonet.vibes81.whopper.ModBlocks;
 import nonet.vibes81.whopper.util.IGuiTile;
 import nonet.vibes81.whopper.util.IRestorableTileEntity;
 import nonet.vibes81.whopper.util.WhooperConfig;
@@ -25,11 +30,12 @@ import nonet.vibes81.whopper.util.WhooperConfig;
 import javax.annotation.Nonnull;
 import java.util.List;
 
-public class TileWhopper extends TileEntity implements IRestorableTileEntity, ITickable, IGuiTile {
+public class TileWhopper extends TileEntity implements IRestorableTileEntity, ITickable, IGuiTile, IWorldNameable {
 
     static final int SIZE = 1;
     private boolean didFirstTick;
     private boolean isRedstonePowered;
+    private String customName;
 
 
     // ----------------------------------------------------------------------------------------
@@ -124,10 +130,15 @@ public class TileWhopper extends TileEntity implements IRestorableTileEntity, IT
     @Override
     public void writeRestorableToNBT(NBTTagCompound compound) {
         compound.setTag("inventory", inventory.serializeNBT());
+        if(this.hasCustomName())
+            compound.setString("CustomName", this.customName);
     }
+
     @Override
     public void readRestorableFromNBT(NBTTagCompound compound, boolean reset) {
-        inventory.deserializeNBT(compound.getCompoundTag("inventory"));
+         this.inventory.deserializeNBT(compound.getCompoundTag("inventory"));
+        if (compound.hasKey("CustomName", 8))
+            this.customName = compound.getString("CustomName");
     }
 
     int getComparatorLevel() {
@@ -143,6 +154,30 @@ public class TileWhopper extends TileEntity implements IRestorableTileEntity, IT
         return MathHelper.floor(f * 14.0F) + (i > 0 ? 1 : 0);
     }
 
+
+    @Override
+    public ITextComponent getDisplayName() {
+        return this.hasCustomName() ? new TextComponentString(this.customName) : new TextComponentTranslation(ModBlocks.blockWhopper.getLocalizedName());
+    }
+
+    void setCustomName(String customName) {
+        this.customName = customName;
+    }
+
+    @Override
+    public String getName() {
+        return this.hasCustomName() ? this.customName : ModBlocks.blockWhopper.getTranslationKey();
+    }
+
+    @Override
+    public boolean hasCustomName() {
+        return this.customName != null && !this.customName.isEmpty();
+    }
+
+    @Override
+    public NBTTagCompound getUpdateTag() {
+        return this.writeToNBT(new NBTTagCompound());
+    }
     // ----------------------------------------------------------------------------------------
     //Interactions
     @SuppressWarnings("NullableProblems")
@@ -150,6 +185,7 @@ public class TileWhopper extends TileEntity implements IRestorableTileEntity, IT
     public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newState){
         return !oldState.getBlock().isAssociatedBlock(newState.getBlock());
     }
+
     void onChange(){
         this.handlerPull = null;
         this.handlerPush = null;

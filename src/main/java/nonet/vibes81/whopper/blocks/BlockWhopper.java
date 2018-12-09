@@ -206,6 +206,18 @@ public class BlockWhopper extends Block implements ITileEntityProvider, IGuiTile
         }
     }
 
+    public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
+        super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
+
+        if (stack.hasDisplayName()) {
+            TileEntity te = worldIn.getTileEntity(pos);
+            if (te instanceof TileWhopper) {
+                ((TileWhopper) te).setCustomName(stack.getDisplayName());
+            }
+        }
+
+    }
+
     @Override
     public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         // Only execute on the server
@@ -237,6 +249,33 @@ public class BlockWhopper extends Block implements ITileEntityProvider, IGuiTile
             }
         }
         super.breakBlock(worldIn, pos, state);
+    }
+    @Override
+    public boolean removedByPlayer(IBlockState state, World world, BlockPos pos, EntityPlayer player, boolean willHarvest) {
+        if (willHarvest) {
+            return true; // If it will harvest, delay deletion of the block until after getDrops
+        }
+        return super.removedByPlayer(state, world, pos, player, willHarvest);
+    }
+    @Override
+    public void getDrops(NonNullList<ItemStack> result, IBlockAccess world, BlockPos pos, IBlockState metadata, int fortune) {
+        TileEntity tileEntity = world.getTileEntity(pos);
+        if (tileEntity instanceof TileWhopper && ((TileWhopper) tileEntity).hasCustomName()) {
+            ItemStack stack = new ItemStack(Item.getItemFromBlock(this));
+            String customName = ((TileWhopper) tileEntity).getName();
+            stack.setRepairCost(0);
+            stack.setStackDisplayName(customName);
+            result.add(stack);
+        }
+        else {
+            super.getDrops(result, world, pos, metadata, fortune);
+        }
+    }
+
+    @Override
+    public void harvestBlock(World world, EntityPlayer player, BlockPos pos, IBlockState state, TileEntity te, ItemStack stack) {
+        super.harvestBlock(world, player, pos, state, te, stack);
+        world.setBlockToAir(pos);
     }
 
     @SideOnly(Side.CLIENT)
