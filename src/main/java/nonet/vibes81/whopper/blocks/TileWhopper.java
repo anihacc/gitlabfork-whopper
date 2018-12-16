@@ -19,6 +19,8 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.IWorldNameable;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
@@ -221,6 +223,7 @@ public class TileWhopper extends TileEntity implements IRestorableTileEntity, IT
     public Container createContainer(EntityPlayer player) {
         return new ContainerWhopper(player.inventory, this);
     }
+    @SideOnly(Side.CLIENT)
     @Override
     public GuiContainer createGui(EntityPlayer player) {
         return new GuiWhopper(this, new ContainerWhopper(player.inventory, this));

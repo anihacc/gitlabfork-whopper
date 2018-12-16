@@ -8,12 +8,10 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.Container;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -28,11 +26,10 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import nonet.vibes81.whopper.Main;
-import nonet.vibes81.whopper.util.IGuiTile;
+import nonet.vibes81.whopper.util.IRestorableTileEntity;
 import nonet.vibes81.whopper.util.Ref;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -42,7 +39,7 @@ import java.util.stream.Stream;
 
 import static net.minecraft.inventory.InventoryHelper.spawnItemStack;
 
-public class BlockWhopper extends Block implements ITileEntityProvider, IGuiTile {
+public class BlockWhopper extends Block implements ITileEntityProvider {
 
     public static final PropertyDirection FACING = PropertyDirection.create("facing", facing -> facing != EnumFacing.UP);
     public static final ResourceLocation BLOCK_WHOPPER = new ResourceLocation(Ref.MOD_ID, "whopper");
@@ -91,14 +88,12 @@ public class BlockWhopper extends Block implements ITileEntityProvider, IGuiTile
     }
 
     // ----------------------------------------------------------------------------------------
-    @SuppressWarnings({"NullableProblems", "deprecation"})
     @Override
     public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer){
 
         EnumFacing opp = facing.getOpposite();
         return this.getDefaultState().withProperty(FACING, opp == EnumFacing.UP ? EnumFacing.DOWN : opp);
     }
-    @SuppressWarnings({"NullableProblems", "deprecation"})
     @Override
     public IBlockState getStateFromMeta(int meta) {
         return this.getDefaultState().withProperty(FACING, EnumFacing.byIndex(meta));
@@ -107,32 +102,26 @@ public class BlockWhopper extends Block implements ITileEntityProvider, IGuiTile
     public int getMetaFromState(IBlockState state){
         return state.getValue(FACING).getIndex();
     }
-    @SuppressWarnings("NullableProblems")
     @Override
     protected BlockStateContainer createBlockState(){
         return new BlockStateContainer(this, FACING);
     }
-    @SuppressWarnings({"NullableProblems", "deprecation"})
     @Override
     public IBlockState withRotation(IBlockState state, Rotation rot){
         return state.withProperty(FACING, rot.rotate(state.getValue(FACING)));
     }
-    @SuppressWarnings({"NullableProblems", "deprecation"})
     @Override
     public IBlockState withMirror(IBlockState state, Mirror mirror){
         return this.withRotation(state, mirror.toRotation(state.getValue(FACING)));
     }
-    @SuppressWarnings({"deprecation"})
     @Override
     public boolean isFullCube(IBlockState state){
         return false;
     }
-    @SuppressWarnings({"deprecation"})
     @Override
     public boolean isOpaqueCube(IBlockState state){
         return false;
     }
-    @SuppressWarnings("deprecation")
     @Override
     public RayTraceResult collisionRayTrace(IBlockState blockState, @Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull Vec3d start, @Nonnull Vec3d end) {
         return bounds.get(blockState.getValue(FACING)).stream()
@@ -140,38 +129,24 @@ public class BlockWhopper extends Block implements ITileEntityProvider, IGuiTile
                 .anyMatch(Objects::nonNull)
                 ? super.collisionRayTrace(blockState, worldIn, pos, start, end) : null;
     }
-    @SuppressWarnings({"NullableProblems", "deprecation"})
     @Override
     public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
         return FULL_BLOCK_AABB;
     }
-    @SuppressWarnings({"deprecation", "NullableProblems"})
     @SideOnly(Side.CLIENT)
     public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
         return true;
     }
     // ----------------------------------------------------------------------------------------
-    @SuppressWarnings("NullableProblems")
-    @Nullable
     @Override
     public TileEntity createNewTileEntity(World worldIn, int meta) {
         return new TileWhopper();
     }
-    @Override
-    public Container createContainer(EntityPlayer player) {
-        return null;
-    }
-    @Override
-    public GuiContainer createGui(EntityPlayer player) {
-        return null;
-    }
 
     // ----------------------------------------------------------------------------------------
-    @SuppressWarnings({"deprecation"})
     public boolean hasComparatorInputOverride(IBlockState state) {
         return true;
     }
-    @SuppressWarnings({"deprecation"})
     public int getComparatorInputOverride(IBlockState blockState, World worldIn, BlockPos pos) {
         if (!worldIn.isRemote) {
             TileEntity tile = worldIn.getTileEntity(pos);
@@ -182,7 +157,6 @@ public class BlockWhopper extends Block implements ITileEntityProvider, IGuiTile
         return 0;
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
         super.neighborChanged(state, worldIn, pos, blockIn, fromPos);
@@ -200,21 +174,22 @@ public class BlockWhopper extends Block implements ITileEntityProvider, IGuiTile
     private void neighborChange(World world, BlockPos pos) {
         if (!world.isRemote) {
             TileEntity tile = world.getTileEntity(pos);
-            if (tile instanceof TileWhopper) {
+            if (tile instanceof IRestorableTileEntity) {
                 ((TileWhopper) tile).onChange();
             }
         }
     }
 
+    @Override
     public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
         super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
 
-        if (stack.hasDisplayName()) {
+       if (stack.hasDisplayName()) {
             TileEntity te = worldIn.getTileEntity(pos);
             if (te instanceof TileWhopper) {
                 ((TileWhopper) te).setCustomName(stack.getDisplayName());
             }
-        }
+       }
 
     }
 
@@ -225,13 +200,13 @@ public class BlockWhopper extends Block implements ITileEntityProvider, IGuiTile
             return true;
         }
         TileEntity te = world.getTileEntity(pos);
-        if (!(te instanceof IGuiTile)) {
+        if (!(te instanceof IRestorableTileEntity)) {
             return false;
         }
         player.openGui(Main.instance, 0, world, pos.getX(), pos.getY(), pos.getZ());
         return true;
     }
-    @SuppressWarnings("NullableProblems")
+
     @Override
     public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
         TileEntity tileentity = worldIn.getTileEntity(pos);

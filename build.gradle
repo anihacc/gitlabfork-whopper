@@ -15,11 +15,6 @@ version = "1.0.0"
 group = "nonet.vibes81" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "whopper"
 
-sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
-compileJava {
-    sourceCompatibility = targetCompatibility = '1.8'
-}
-
 minecraft {
     version = "1.12.2-14.23.5.2768"
     runDir = "run"
@@ -44,8 +39,8 @@ dependencies {
     deobfProvided "mezz.jei:jei_1.12.2:4.14.0.231:api"
     runtime "mezz.jei:jei_1.12.2:4.14.0.231"
 
-    deobfProvided "mcjty.theoneprobe:TheOneProbe-1.12:1.12-1.4.23-16:api"
-    runtime "mcjty.theoneprobe:TheOneProbe-1.12:1.12-1.4.23-16"
+    //deobfProvided "mcjty.theoneprobe:TheOneProbe-1.12:1.12-1.4.23-16:api"
+    //runtime "mcjty.theoneprobe:TheOneProbe-1.12:1.12-1.4.23-16"
 }
 
 processResources {
